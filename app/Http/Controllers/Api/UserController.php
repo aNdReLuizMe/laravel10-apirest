@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Http\Client\Request;
 
 class UserController extends Controller
 {
@@ -14,4 +15,15 @@ class UserController extends Controller
 
         return UserResource::collection($users);
     }
+
+    public function store(Request $request)
+    {
+        $data = $request->all();
+        $data['password'] = bcrypt($request->password);
+
+        $user = User::create($data);
+
+        return new UserResource($user);
+    }
+
 }
