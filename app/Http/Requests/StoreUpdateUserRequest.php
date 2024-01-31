@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreUpdateUserRequest extends FormRequest
 {
@@ -21,7 +22,7 @@ class StoreUpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => 'required|min:3|max:255',
             'email' => [
                 'required',
@@ -29,6 +30,28 @@ class StoreUpdateUserRequest extends FormRequest
                 'max:255',
                 'unique:users'
             ],
+            'password' => [
+                'required',
+                'min:6',
+                'max:100',
+            ]
         ];
+        if ($this->method() === 'PATCH'){
+            $rules['password'] = [
+                'nullable',
+                'min:6',
+                'max:100',
+            ];
+            $rules['email'] = [
+                'required',
+                'email',
+                'max:255',
+                // "unique:users,email,{$this->id}",
+                Rule::unique('users')->ignore($this->id),
+
+            ];
+        }
+
+        return $rules;
     }
 }
